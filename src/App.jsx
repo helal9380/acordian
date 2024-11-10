@@ -1,32 +1,50 @@
 /** @format */
+import { useReducer } from "react";
+import AddTask from "./components/AddTask";
+import TaskList from "./components/TaskList";
+import { initialTasks } from "./data/data";
+import tasksReducer from "./reducer/reducer";
+export default function App() {
+  const [tasks, dispatch] = useReducer(tasksReducer, initialTasks);
 
-import { useState } from "react";
-import "./App.css";
-import Acordian from "./components/Acordian";
+  const nextId = (data) => {
+    const maxId = data.reduce((pre, current) =>
+      pre && pre.id > current.id ? pre.id : current.id
+    );
+    return maxId + 1;
+  };
 
-function App() {
-  const [active, setActive] = useState(0);
+  function handleAddTask(text) {
+    dispatch({
+      type: "added",
+      id: nextId(tasks),
+      text,
+    });
+  }
+
+  function handleChangeTask(task) {
+    dispatch({
+      type: "changed",
+      task,
+    });
+  }
+
+  function handleDeleteTask(taskId) {
+    dispatch({
+      type: "deleted",
+      id: taskId,
+    });
+  }
 
   return (
     <>
-      <Acordian
-        title={"Paid Course"}
-        isActive={active === 0}
-        onActive={() => setActive(0)}
-        description={
-          "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum eius nesciunt libero necessitatibus velit quidem architecto hic illum et explicabo facere nihil repudiandae magni nam sit amet natus, repellat pariatur?"
-        }
-      />
-      <Acordian
-        title={"Free Course"}
-        isActive={active === 1}
-        onActive={() => setActive(1)}
-        description={
-          "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum eius nesciunt libero necessitatibus"
-        }
+      <h1>Prague itinerary</h1>
+      <AddTask onAddTask={handleAddTask} />
+      <TaskList
+        tasks={tasks}
+        onChangeTask={handleChangeTask}
+        onDeleteTask={handleDeleteTask}
       />
     </>
   );
 }
-
-export default App;
